@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Domain Extractor</title>
+  </head>
+  <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        textarea {
+            width: 80%;
+            height: 150px;
+            margin-top: 10px;
+        }
+    </style>
+  <body>
+    <h1>Domain Extractor</h1>
+    <textarea
+      id="urlsInput"
+      placeholder="Enter URLs"
+    ></textarea>
+    <br />
+    <button onclick="extractAndDownloadDomains()">RUN</button>
+    <script>
+      function extractAndDownloadDomains() {
+        const urlsInput = document.getElementById('urlsInput');
+
+        const urls = urlsInput.value.split(/\s+/);
+        const domains = [];
+
+        for (const url of urls) {
+          const cleanedUrl = cleanUrl(url);
+          const domain = extractDomain(cleanedUrl);
+          if (domain) {
+            domains.push([domain]);
+          }
+        }
+
+        const csvContent = domains.map((row) => row.join(',')).join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv' });
+
+        // Auto downloads csv
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'domains.csv';
+        link.click();
+      }
+
+      function cleanUrl(url) {
+        return url.replace(/^(https?:\/\/)?(ww\d?\.|www\.|www\d?\.)?/, '');
+      }
+
+      function extractDomain(url) {
+        const urlObj = new URL('https://' + url);
+        const cleanedDomain = urlObj.hostname.replace(/^www\./, '');
+        return cleanedDomain;
+      }
+    </script>
+  </body>
+</html>
